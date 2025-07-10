@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setting Up an EC2 Instance and Pointing a Namecheap Domain</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        code {
+            background-color: #eaeaea;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        pre {
+            background-color: #eaeaea;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Complete Guide: Setting Up an EC2 Instance and Pointing a Namecheap Domain to It</h1>
+
+<p>This guide provides a full process for launching an Amazon EC2 instance, setting up a web server, and configuring a Namecheap domain to point to that instance.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+    <li>An <a href="https://aws.amazon.com/">AWS</a> account</li>
+    <li>A registered domain on <a href="https://www.namecheap.com/">Namecheap</a></li>
+    <li>Basic knowledge of web servers and DNS settings</li>
+</ul>
+
+<h2>Part 1: Launching and Configuring an EC2 Instance</h2>
+
+<ol>
+    <li><strong>Log into Your AWS Account</strong>:
+        <ul>
+            <li>Go to the <a href="https://aws.amazon.com/console/">AWS Management Console</a>.</li>
+        </ul>
+    </li>
+    <li><strong>Navigate to EC2</strong>:
+        <ul>
+            <li>In the <strong>Services</strong> menu, select <strong>EC2</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Launch an Instance</strong>:
+        <ul>
+            <li>Click on the <strong>Launch Instance</strong> button.</li>
+        </ul>
+    </li>
+    <li><strong>Choose an Amazon Machine Image (AMI)</strong>:
+        <ul>
+            <li>Select an AMI suited to your needs (e.g., Amazon Linux, Ubuntu, etc.).</li>
+        </ul>
+    </li>
+    <li><strong>Choose an Instance Type</strong>:
+        <ul>
+            <li>Select an instance type (e.g., <code>t2.micro</code>, which is eligible for the free tier) and click <strong>Next: Configure Instance Details</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Configure Instance Details</strong>:
+        <ul>
+            <li>Adjust settings as needed (the default should be sufficient for basic setups). Click <strong>Next: Add Storage</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Add Storage</strong>:
+        <ul>
+            <li>Adjust the size if necessary, then click <strong>Next: Add Tags</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Add Tags</strong> (optional):
+        <ul>
+            <li>Add tags for organization (e.g., Name: MyWebServer). Click <strong>Next: Configure Security Group</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Configure Security Group</strong>:
+        <ul>
+            <li>Create a security group to allow HTTP and SSH access:
+                <ul>
+                    <li><strong>Type</strong>: HTTP, <strong>Port</strong>: 80, <strong>Source</strong>: Anywhere (0.0.0.0/0)</li>
+                    <li><strong>Type</strong>: SSH, <strong>Port</strong>: 22, <strong>Source</strong>: Your IP (for security) or Anywhere (0.0.0.0/0) for broad access</li>
+                </ul>
+            </li>
+            <li>Click <strong>Review and Launch</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Launch the Instance</strong>:
+        <ul>
+            <li>Review your settings and click <strong>Launch</strong>.</li>
+            <li>Select an existing key pair or create a new one to use for SSH access. Download the private key file (*.pem) if creating a new pair.</li>
+        </ul>
+    </li>
+    <li><strong>Access Your EC2 Instance</strong>:
+        <ul>
+            <li>Open a terminal (or PuTTY if using Windows) and run:
+                <pre><code>ssh -i /path/to/your-key.pem ec2-user@your-instance-public-ip</code></pre>
+            </li>
+            <li>Replace <code>/path/to/your-key.pem</code> with the path to your downloaded key and <code>your-instance-public-ip</code> with the public IP.</li>
+        </ul>
+    </li>
+    <li><strong>Install a Web Server</strong>:
+        <ul>
+            <li>For example, to install Apache on Amazon Linux:
+                <pre><code>sudo yum update -y
+sudo yum install httpd -y
+sudo systemctl start httpd
+sudo systemctl enable httpd</code></pre>
+            </li>
+            <li>Check that your web server is running by visiting your instance's public IP in a web browser.</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>Part 2: Configuring Your Domain on Namecheap</h2>
+
+<ol>
+    <li><strong>Log into Your Namecheap Account</strong>:
+        <ul>
+            <li>Go to the <a href="https://www.namecheap.com/">Namecheap login page</a> and log in.</li>
+        </ul>
+    </li>
+    <li><strong>Navigate to Domain List</strong>:
+        <ul>
+            <li>Click on <strong>Domain List</strong> in the left sidebar.</li>
+            <li>Locate the domain you want to configure.</li>
+        </ul>
+    </li>
+    <li><strong>Manage the Domain</strong>:
+        <ul>
+            <li>Click the <strong>Manage</strong> button next to your domain name.</li>
+        </ul>
+    </li>
+    <li><strong>Change to BasicDNS</strong> (if applicable):
+        <ul>
+            <li>Find the <strong>Nameservers</strong> section. If it’s not already set, change to <strong>Namecheap BasicDNS</strong> and save.</li>
+        </ul>
+    </li>
+    <li><strong>Access Advanced DNS</strong>:
+        <ul>
+            <li>Click on the <strong>Advanced DNS</strong> tab.</li>
+        </ul>
+    </li>
+    <li><strong>Add A Records</strong>:
+        <ul>
+            <li><strong>For the Root Domain (<code>example.com</code>)</strong>:
+                <ul>
+                    <li>Click on <strong>Add New Record</strong>.</li>
+                    <li><strong>Type</strong>: A Record</li>
+                    <li><strong>Host</strong>: <code>@</code></li>
+                    <li><strong>Value</strong>: Your EC2 instance's public IP (e.g., <code>203.0.113.25</code>)</li>
+                    <li><strong>TTL</strong>: Automatic</li>
+                </ul>
+            </li>
+            <li><strong>For the <code>www</code> Subdomain (<code>www.example.com</code>)</strong>:
+                <ul>
+                    <li>Click on <strong>Add New Record</strong>.</li>
+                    <li><strong>Type</strong>: A Record</li>
+                    <li><strong>Host</strong>: <code>www</code></li>
+                    <li><strong>Value</strong>: Your EC2 instance's public IP (same as above)</li>
+                    <li><strong>TTL</strong>: Automatic</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li><strong>Save Changes</strong>:
+        <ul>
+            <li>Ensure all records are saved.</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>Part 3: Testing the Configuration</h2>
+
+<ol>
+    <li><strong>Wait for DNS Propagation</strong>:
+        <ul>
+            <li>DNS changes may take a few minutes to 48 hours to propagate. Use tools like <a href="https://www.whatsmydns.net/">WhatsMyDNS</a> to verify.</li>
+        </ul>
+    </li>
+    <li><strong>Test Your Domain</strong>:
+        <ul>
+            <li>After waiting, navigate to <code>http://example.com</code> and <code>http://www.example.com</code> in a web browser.</li>
+            <li>Confirm that your website displays correctly.</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>Conclusion</h2>
+<p>By following these steps, you’ve successfully spun up an EC2 instance, set up a web server, and configured your Namecheap domain to point to that instance. If any issues arise during the process, double-check the configurations and ensure your EC2 instance is running properly. If you have any questions, feel free to ask!</p>
+
+<footer>
+    <p>&copy; 2025 Your Name. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

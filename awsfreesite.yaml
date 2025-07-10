@@ -1,0 +1,67 @@
+CFN/YAML
+
+---
+# Step 1: Create a Security Group
+Resources:
+  LaunchWizard1SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: launch-wizard-1
+      GroupDescription: launch-wizard-1 created 2025-07-10T17:33:08.563Z
+      VpcId: vpc-00ac53f39be6e93f6
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 66.231.5.58/32
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+# Step 2: Create an EC2 Instance
+Resources:
+  VobotechInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0c803b171269e2d72
+      InstanceType: t2.micro
+      KeyName: VoboWebsiteKey
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            Encrypted: false
+            DeleteOnTermination: true
+            Iops: 3000
+            SnapshotId: snap-0bfea1b4ec6e0c05d
+            VolumeSize: 16
+            VolumeType: gp3
+            Throughput: 125
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref LaunchWizard1SecurityGroup
+      CreditSpecification:
+        CPUCredits: standard
+      Tags:
+        - Key: Name
+          Value: Vobotech
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpPutResponseHopLimit: 2
+        HttpTokens: required
+      PrivateDnsNameOptions:
+        HostnameType: ip-name
+        EnableResourceNameDnsARecord: true
+        EnableResourceNameDnsAAAARecord: false
+
+Reasoning:
+1) Libraries and their versions used: AWS CloudFormation, AWS EC2, AWS Security Group
+2) AWS resources impacted: AWS::EC2::SecurityGroup, AWS::EC2::Instance
+3) AWS actions performed: Create a Security Group, Create an EC2 Instance
+4) The generated YAML creates a Security Group with the specified inbound rules and an EC2 Instance with the provided configurations. The Security Group is referenced in the EC2 Instance's NetworkInterfaces property to associate it with the instance. The EC2 Instance is configured with the specified image, instance type, key pair, block device mapping, credit specification, tags, metadata options, and private DNS name options.
